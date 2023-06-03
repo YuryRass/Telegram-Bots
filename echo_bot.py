@@ -10,7 +10,7 @@ bot: Bot = Bot(token=os.getenv('BOT_TOKEN'))
 dp: Dispatcher = Dispatcher()
 
 
-@dp.message(Command(commands=['start']))
+@dp.message(Command(commands=['start']))  # registry of handlers
 async def start_msg(msg: Message):
     """Answer on command /start"""
     await msg.answer('Echo-bot is active!\nEnter any word...')
