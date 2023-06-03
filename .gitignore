@@ -2,3 +2,9 @@
 venv/
 
 .vscode/
+
+# Stepik lectures:
+.info.py
+
+# BOT info:
+.env
