@@ -1,6 +1,6 @@
 """Application: EchoBot"""
 import os
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher, F
 from aiogram.types import Message
 from aiogram.filters import Command
 from dotenv import load_dotenv
@@ -20,6 +20,13 @@ async def start_msg(msg: Message):
 async def help_msg(msg: Message):
     """Answer on command /help"""
     await msg.answer('Bot will simply echo back any message we send it')
+
+
+@dp.message(F.photo)
+async def send_photo(msg: Message):
+    """Reply on photo from client"""
+    print(msg.photo)
+    await msg.reply(msg.photo[0].file_id)
 
 
 @dp.message()
