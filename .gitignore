@@ -1,10 +1,12 @@
 # virtual environment:
 venv/
 
-.vscode/
-
 # Stepik lectures:
 .info.py
 
 # BOT info:
 .env
+
+# Python files:
+__pycache__
+.vscode/
