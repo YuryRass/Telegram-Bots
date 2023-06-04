@@ -22,17 +22,22 @@ async def help_msg(msg: Message):
     await msg.answer('Bot will simply echo back any message we send it')
 
 
-@dp.message(F.photo)
-async def send_photo(msg: Message):
-    """Reply on photo from client"""
-    print(msg.photo)
-    await msg.reply(msg.photo[0].file_id)
+# @dp.message(F.photo)
+# async def send_photo(msg: Message):
+#     """Reply on photo from client"""
+#     print(msg.photo)
+#     await msg.reply(msg.photo[0].file_id)
+
+
+# @dp.message()
+# async def send_msg(msg: Message):
+#     """Reply on any word from client"""
+#     await msg.reply(text=msg.text)
 
 
 @dp.message()
-async def send_msg(msg: Message):
-    """Reply on any word from client"""
-    await msg.reply(text=msg.text)
+async def send_copy(msg: Message):
+    await msg.send_copy(chat_id=msg.chat.id)
 
 
 if __name__ == "__main__":
