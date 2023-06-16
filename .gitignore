@@ -1,9 +1,6 @@
 # virtual environment:
 venv/
 
-# Stepik lectures:
-.info.py
-
 # BOT info:
 .env
 
