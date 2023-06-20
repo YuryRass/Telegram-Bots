@@ -28,3 +28,9 @@ USER_WIN_SERIES: tuple[tuple[str]] = (
     ('Ножницы ✂', 'Бумага 📜'),
     ('Бумага 📜', 'Камень 🗿')
 )
+
+LEXICON_COMMANS_RU: dict[str, str] = {
+    '/help': 'Справка по работе бота',
+    '/start': 'Запуск работы бота',
+    'delmenu': 'Удалить кнопку меню'
+}
