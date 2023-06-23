@@ -6,7 +6,7 @@ from aiogram.fsm.state import default_state
 from handlers import get_main_menu, bot_welcome_phrase
 from lexicon import BOT_BUTTONS, BOT_PHRASE, get_weather_information
 from states import ChoiceCityWeather
-from api_requests import get_weather
+from api_requests import WeatherInCity
 from database import add_city, create_report, get_user_city
 
 
@@ -40,7 +40,8 @@ async def show_weather_in_chosen_city(message: Message, state: FSMContext):
     await state.update_data(waiting_city=message.text)
     keyboard: ReplyKeyboardMarkup = await get_main_menu()
     city = await state.get_data()
-    data = get_weather(city.get('waiting_city'))
+    weather_in_city: WeatherInCity = WeatherInCity(city.get('waiting_city'))
+    data = weather_in_city.get_weather()
     info: str = f'Погода в городе {city.get("waiting_city")}\n' + \
         get_weather_information(data["temp"], data["feels_like"],
                                 data["wind_speed"], data["pressure_mm"])
@@ -84,7 +85,8 @@ async def show_weather_in_my_city(message: Message, state: FSMContext) -> None:
         await message.answer(text=BOT_PHRASE['set_city_warning'],
                              reply_markup=keyboard)
         return
-    data = get_weather(my_city)
+    weather_in_city: WeatherInCity = WeatherInCity(my_city)
+    data = weather_in_city.get_weather()
     if data:
         create_report(str(message.from_user.id), int(data["temp"]),
                       int(data["feels_like"]), int(data["wind_speed"]),
