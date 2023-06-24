@@ -23,3 +23,7 @@ def get_weather_information(temp: str, feels_like: str,
         f'Ощущается как: {feels_like} C \n' + \
         f'Скорость ветра: {wind_speed}м/с\n' + \
         f'Давление: {pressure_mm}мм'
+
+
+def bot_welcome_phrase(first_name: str):
+    return f'Привет {first_name}, ' + BOT_PHRASE['welcome']
