@@ -5,7 +5,8 @@ BOT_PHRASE: dict[str, str] = {
     'input_city_name': 'Введите название города',
     'input_your_city_name': 'Введите название города, в котором Вы находитесь',
     'set_city_warning': 'Установите сначала город, в котором находитесь',
-    'not_such_city': 'Не удалось найти информацию по данному городу'
+    'not_such_city': 'Не удалось найти информацию по данному городу',
+    'history_of_queries': 'История ваших запросов'
 }
 
 BOT_BUTTONS: dict[str, str] = {
@@ -13,7 +14,10 @@ BOT_BUTTONS: dict[str, str] = {
     'weather_in_other_city': 'Погода в другом городе',
     'history': 'История',
     'set_your_city': 'Установить свой город',
-    'menu': 'Меню'
+    'menu': 'Меню',
+    'back': 'back_page',
+    'next': 'next_page',
+    'not_call': 'not_call'
 }
 
 

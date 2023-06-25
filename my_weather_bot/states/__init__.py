@@ -1,1 +1,1 @@
-from states.states import ChoiceCityWeather
+from states.states import ChoiceCityWeather, ReportsPages

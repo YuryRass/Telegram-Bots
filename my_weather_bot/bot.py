@@ -9,7 +9,7 @@ async def main():
     storage: MemoryStorage = MemoryStorage()
     dp: Dispatcher = Dispatcher(storage=storage)
     config: Config = load_config()
-    bot: Bot = Bot(token=config.bot.bot_token)
+    bot: Bot = Bot(token=config.bot.bot_token, parse_mode='HTML')
 
     dp.include_router(user_handlers.router)
     dp.include_router(other_handlers.router)

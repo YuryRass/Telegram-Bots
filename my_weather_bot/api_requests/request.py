@@ -27,14 +27,14 @@
 ----------------------------------------------------
 
 Использующиеся методы класса:
-    -- get_weather_coordinates(city: str) -> tuple[str, str] | None -
+    -- _get_weather_coordinates(city: str) -> tuple[str, str] | None -
     возвращает географиеские координаты (широту, долготу) города
     Параметры функции:
     city: str - название города
     Исключения:
     Если информацию о погоде не удалось найти вызывается исключение
 
-    -- get_temp_info(lat: str, lon: str) -> dict[str, str] - возвращает
+    -- _get_temp_info(lat: str, lon: str) -> dict[str, str] - возвращает
     информацию о погоде на сегодня для некоторого города, который
     задается географическими координатами
     Параметры функции:
@@ -66,7 +66,7 @@ class WeatherInCity():
     def __init__(self, city: str) -> None:
         self.city = city
 
-    def __get_weather_coordinates(self) -> tuple[str, str] | None:
+    def _get_weather_coordinates(self) -> tuple[str, str] | None:
 
         """Возвращает географиеские координаты города"""
 
@@ -81,7 +81,7 @@ class WeatherInCity():
         coords: list[str] = _crds[0]["GeoObject"]["Point"]["pos"].split()
         return coords[0], coords[1]  # (широта, долгота)
 
-    def __get_temp_info(self, lat: str, lon: str) -> dict[str, str]:
+    def _get_temp_info(self, lat: str, lon: str) -> dict[str, str]:
 
         """Возвращает информацию о погоде на сегодня для некоторого города,
         который задается географическими координатами
@@ -99,8 +99,8 @@ class WeatherInCity():
 
         """Возвращает информацию о погоде на сегодня для некоторого города"""
 
-        coords: tuple[str, str] = self.__get_weather_coordinates()
+        coords: tuple[str, str] = self._get_weather_coordinates()
         if not coords:
             return None
         lon, lat = coords
-        return self.__get_temp_info(lat, lon)
+        return self._get_temp_info(lat, lon)
