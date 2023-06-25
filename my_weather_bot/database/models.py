@@ -23,7 +23,7 @@ from datetime import datetime
 from dataclasses import dataclass
 from sqlalchemy.orm import relationship, declarative_base
 from sqlalchemy import Integer, String, DateTime,\
-                       Column, create_engine, ForeignKey
+                       Column, ForeignKey
 
 Base = declarative_base()
 
@@ -45,7 +45,7 @@ class User(Base):
 
 @dataclass
 class WeatherReports(Base):
-    """Таблица, отображающая отчет о погоде"""
+    """Таблица, отображающая сведения о погоде"""
 
     __tablename__ = 'WeatherReports'
     id = Column('id', Integer, primary_key=True, autoincrement=True)
@@ -56,11 +56,3 @@ class WeatherReports(Base):
     wind_speed = Column('wind_speed', Integer, nullable=False)
     pressure_mm = Column('pressure_mm', Integer, nullable=False)
     city = Column('city', String, nullable=False)
-
-
-# def create_tables(db_user: str, db_passwd: str, db_address: str):
-#     """Подключение к базе данных и создание таблиц"""
-
-#     engine: Engine = create_engine(f'postgresql://{db_user}:{db_passwd}'
-#                                    '@{db_address}', echo=True)
-#     Base.metadata.create_all(engine)
