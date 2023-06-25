@@ -1,3 +1,5 @@
+"""Модуль для создания пользовательских клавиатур для Telegram бота"""
+
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, \
     InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
@@ -8,11 +10,11 @@ from database import WeatherReports
 def get_main_menu_kb() -> ReplyKeyboardMarkup:
 
     """Основная клавиатура для взаимодействия с пользователем:
-    -------------------------------------------------
-    | Погода в моем городе | Погода в другом городе |
-    -------------------------------------------------
-    |        История       | Установить свой город  |
-    -----------------------------------------------
+        -------------------------------------------------
+        | Погода в моем городе | Погода в другом городе |
+        -------------------------------------------------
+        |        История       | Установить свой город  |
+        -----------------------------------------------
     """
 
     btn1: KeyboardButton = KeyboardButton(
@@ -31,6 +33,10 @@ def get_main_menu_kb() -> ReplyKeyboardMarkup:
 
 
 def get_menu_kb() -> ReplyKeyboardMarkup:
+    """
+    Клавиаутура с одной клавишей | Меню |, при нажати на которую
+    отображается основная клавиатура Telegram бота
+    """
     menu_btn = KeyboardButton(text=BOT_BUTTONS['menu'])
     kb_menu: ReplyKeyboardMarkup = ReplyKeyboardMarkup(keyboard=[[menu_btn]],
                                                        resize_keyboard=True)
@@ -39,10 +45,42 @@ def get_menu_kb() -> ReplyKeyboardMarkup:
 
 def get_reports_desk(reports: list[WeatherReports],
                      current_page: int) -> InlineKeyboardMarkup | None:
+    """
+    Инлаин-клавиатура, отображающая историю пользовательских запросов о погоде
+    в городах в разное время
+
+                |    <city_1> <date_1 (%d-%m-%Y)>    |
+                --------------------------------------
+                |    <city_2> <date_2 (%d-%m-%Y)>    |
+                --------------------------------------
+                |    <city_3> <date_3 (%d-%m-%Y)>    |
+                --------------------------------------
+                |    <city_4> <date_4 (%d-%m-%Y)>    |
+                --------------------------------------
+                |Назад| |<page>/<total_page>| |Вперед|
+                --------------------------------------
+
+    Предоставляет возможность пагинации. При нажатии на каждую из клавиш
+    отправляет соответсвующий callback, который затем
+    перехватывается хендлерами.
+    Названия callback-ов для клавиш:
+    |<city_1> <date_1 (%d-%m-%Y)>| - report_<ID отчета>
+    |Назад| - page_back
+    |Вперед| - page_next
+    |<page>/<total_page>| - not_call (при нажатии не будет происходить
+    каких-либо действий)
+    """
+
     kb_builder: InlineKeyboardBuilder = InlineKeyboardBuilder()
+    # первые четыре клавиши для получения информации
+    # о погоде в некотором городе:
     btns: list[InlineKeyboardButton] = []
+    # количество отчетов о погоде на одной странице:
     chunk_size: int = 4
+    # список, куда будут помещаться другие списки,
+    # каждый из которых хранит четыре отчета о погоде:
     splitted_reports = list()
+
     for i in range(0, len(reports), chunk_size):
         splitted_reports.append(reports[i:i+chunk_size])
 
@@ -66,6 +104,8 @@ def get_reports_desk(reports: list[WeatherReports],
     next_btn: InlineKeyboardButton = InlineKeyboardButton(
         text='Вперёд', callback_data=BOT_BUTTONS['next'])
 
+    # Добавляем эффекты пролистывания страниц,
+    # что свойственно для пагинации:
     if current_page == len(splitted_reports):
         kb_builder.row(back_btn, statistic_btn)
     elif current_page == 1:
