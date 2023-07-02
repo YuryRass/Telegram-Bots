@@ -9,7 +9,8 @@ from database import Base, User, WeatherReports
 
 config: Config = load_config()  # загрузка конфиг. данных
 engine = create_engine(url=f'postgresql://{config.db.user_name}:' +
-                       f'{config.db.user_passsword}@{config.db.address}')
+                       f'{config.db.user_passsword}@{config.db.address}',
+                       echo=True)
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()

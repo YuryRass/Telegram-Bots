@@ -1,0 +1,11 @@
+# python:
+venv, .mypy_cache, .vscode
+
+# environments:
+.env.example
+
+# git:
+.gitignore
+
+# docker:
+Dockerfile, .dockerignore, docker-compose.yaml

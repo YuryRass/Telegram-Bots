@@ -8,3 +8,6 @@ venv
 .vscode
 .mypy_cache
 __pycache__
+
+# docker:
+docker-compose.yaml
