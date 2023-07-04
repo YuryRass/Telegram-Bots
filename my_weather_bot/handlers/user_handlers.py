@@ -1,3 +1,6 @@
+"""
+    Handler, срабатывающий на сообщение /start от пользователя
+"""
 from aiogram import Router
 from aiogram.types import Message, ReplyKeyboardMarkup
 from aiogram.filters import CommandStart, StateFilter
@@ -12,9 +15,11 @@ router = Router()
 
 @router.message(CommandStart(), StateFilter(default_state))
 async def start_command(message: Message):
+    # добавление пользователя, который отправил сообщение в БД User:
     add_user(str(message.from_user.id))
+    # главная клавиатура для пользователя:
     main_kb: ReplyKeyboardMarkup = get_main_menu_kb()
 
-    text: str = bot_welcome_phrase(message.from_user.first_name)
-
-    await message.answer(text=text, reply_markup=main_kb)
+    # приветсвенная фраза от бота:
+    await message.answer(text=bot_welcome_phrase(message.from_user.first_name),
+                         reply_markup=main_kb)

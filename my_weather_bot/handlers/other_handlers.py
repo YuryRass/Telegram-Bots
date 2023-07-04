@@ -1,3 +1,7 @@
+"""
+    Handler-ы, срабатывающие при нажатии
+    пользователем на клавиши главной клавиатуры
+"""
 from aiogram import Router
 from aiogram.types import Message, ReplyKeyboardMarkup, InlineKeyboardMarkup
 from aiogram.filters import Text, StateFilter
@@ -16,15 +20,27 @@ router: Router = Router()
 
 
 @router.message(Text(text=BOT_BUTTONS['menu']))
-async def show_main_menu(message: Message, state: FSMContext) -> None:
+async def show_main_menu(message: Message, state: FSMContext):
+    """
+        При нажатии на клавишу 'Меню' отображается
+        главная пользовательская клавиатура
+    """
+    # Обнуляем состояние:
     await state.set_state(state=None)
+    # Получаем главную пользовательскую клавиатуру:
     keyboard: ReplyKeyboardMarkup = get_main_menu_kb()
-    text: str = bot_welcome_phrase(message.from_user.first_name)
-    await message.answer(text=text, reply_markup=keyboard)
+
+    # Отображаем приветсвенное сообщение от бота вместе с главной клавиатурой
+    await message.answer(text=bot_welcome_phrase(message.from_user.first_name),
+                         reply_markup=keyboard)
 
 
 @router.message(Text(text=BOT_BUTTONS['weather_in_other_city']))
-async def other_city_start(message: Message, state: FSMContext) -> None:
+async def other_city_start(message: Message, state: FSMContext):
+    """
+        Инициализация состояния state при нажатии пользователем
+        на клавишу |Погода в другом городе|
+    """
     menu_kb: ReplyKeyboardMarkup = get_menu_kb()
     await message.answer(text=BOT_PHRASE['input_city_name'],
                          reply_markup=menu_kb)
@@ -52,7 +68,7 @@ async def show_weather_in_chosen_city(message: Message, state: FSMContext):
 
 
 @router.message(Text(text=BOT_BUTTONS['set_your_city']))
-async def my_city_start(message: Message, state: FSMContext) -> None:
+async def my_city_start(message: Message, state: FSMContext):
     menu_kb: ReplyKeyboardMarkup = get_menu_kb()
     await message.answer(text=BOT_PHRASE['input_your_city_name'],
                          reply_markup=menu_kb)
@@ -71,37 +87,64 @@ async def update_current_page(message: Message, state: FSMContext):
 
 @router.message(StateFilter(ChoiceCityWeather.my_city))
 async def my_city_input(message: Message, state: FSMContext):
+    """
+        Загрузка в базу данных города,
+        в котором проживает пользователь
+    """
     if message.text[0].islower():
+        # Город должен начинаться с заглавной буквы
         await message.answer(text=BOT_PHRASE['incorrect_name_of_city'])
         return
+    # Обновление пользовательского города:
     await state.update_data(my_city=message.text)
+
     keyboard: ReplyKeyboardMarkup = get_main_menu_kb()
+    # Получение пользовательского города:
     city = await state.get_data()
     my_city: str = city.get('my_city')
-    text: str = f'Отлично! Ваш город: {my_city}\n'
+
+    # Добавление пользовательского города в БД:
     add_city(str(message.from_user.id), my_city)
-    await message.answer(text=text, reply_markup=keyboard)
+    await message.answer(text=f'Отлично! Ваш город: {my_city}\n',
+                         reply_markup=keyboard)
+    # Обнуляем текущее состояние, чтобы
+    # случайно не попасть в данный хендлер:
     await state.set_state(state=None)
 
 
 @router.message(Text(text=BOT_BUTTONS['weather_in_my_city']))
 async def show_weather_in_my_city(message: Message, state: FSMContext) -> None:
+    """
+        Погода в пользовательском городе
+    """
+    # Получаем из БД пользовательский город:
     my_city: str = get_user_city(str(message.from_user.id))
+
     keyboard: ReplyKeyboardMarkup = get_main_menu_kb()
+
+    # Если пользователь еще не установил свой город, то выход
     if not my_city:
         await message.answer(text=BOT_PHRASE['set_city_warning'],
                              reply_markup=keyboard)
         return
+
+    # Получаем данные о погоде через имеющийся API
     weather_in_city: WeatherInCity = WeatherInCity(my_city)
     data = weather_in_city.get_weather()
+
     if data:
+        # Добавляем новые сведения о погоде в городе в БД:
         create_report(str(message.from_user.id), int(data["temp"]),
                       int(data["feels_like"]), int(data["wind_speed"]),
                       int(data["pressure_mm"]), my_city)
+
+        # Подготовка ответного сообщения о погоде для бота:
         info: str = f'Погода в вашем городе {my_city}\n' + \
             get_weather_information(data["temp"], data["feels_like"],
                                     data["wind_speed"], data["pressure_mm"])
+        # отправка ответного сообщения:
         await message.answer(text=info, reply_markup=keyboard)
     else:
+        # если сведения о погоде в данном городе не нашлись
         text: str = f"{BOT_PHRASE['not_such_city']}: {my_city}"
         await message.answer(text=text, reply_markup=keyboard)

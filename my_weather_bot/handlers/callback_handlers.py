@@ -1,3 +1,6 @@
+"""
+    Handler-ы срабатывающие при появлении callback-ов
+"""
 from aiogram import Router
 from aiogram.types import InlineKeyboardMarkup, CallbackQuery
 from aiogram.filters import StateFilter
