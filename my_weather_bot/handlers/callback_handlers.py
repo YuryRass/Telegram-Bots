@@ -17,8 +17,20 @@ router: Router = Router()
 @router.callback_query(IsNextOrBackClick(),
                        StateFilter(ReportsPages.current_page))
 async def callback_query(callback: CallbackQuery, state: FSMContext) -> None:
-    reports: list[WeatherReports] = get_reports(str(callback.from_user.id))
+    """Обработчик, срабатываемый на нажатие инлаин-клавиш вперед | назад.
+
+    Args:
+        callback (CallbackQuery): коллбэк.
+        state (FSMContext): FSM состояние.
+    """
+
+    # получение погодных отчетов
+    weather_reports: list[WeatherReports] = get_reports(
+        str(callback.from_user.id)
+    )
     data = await state.get_data()
+
+    # текущий номер страницы с данными о погоде
     current_page: int = data.get('current_page')
 
     if callback.data == BOT_BUTTONS['next']:
@@ -27,14 +39,16 @@ async def callback_query(callback: CallbackQuery, state: FSMContext) -> None:
         current_page -= 1
 
     inline_kb: InlineKeyboardMarkup | None = get_reports_desk(
-        reports, current_page)
+        weather_reports, current_page
+    )
 
     if not inline_kb:
         await callback.answer()
     else:
         await state.update_data(current_page=current_page)
         await callback.message.edit_text(
-            text=BOT_PHRASE['history_of_queries'], reply_markup=inline_kb)
+            text=BOT_PHRASE['history_of_queries'], reply_markup=inline_kb
+        )
 
 
 @router.callback_query(IsCityReport())
