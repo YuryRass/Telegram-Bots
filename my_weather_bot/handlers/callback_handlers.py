@@ -1,5 +1,5 @@
 """
-    Handler-ы срабатывающие при появлении callback-ов
+    Handler-ы, срабатывающие при появлении callback-ов
 """
 from aiogram import Router
 from aiogram.types import InlineKeyboardMarkup, CallbackQuery
@@ -14,9 +14,13 @@ from database import WeatherReports, get_reports, get_report_city
 router: Router = Router()
 
 
-@router.callback_query(IsNextOrBackClick(),
-                       StateFilter(ReportsPages.current_page))
-async def callback_query(callback: CallbackQuery, state: FSMContext) -> None:
+@router.callback_query(
+    IsNextOrBackClick(),
+    StateFilter(ReportsPages.current_page)
+)
+async def callback_paginator(
+    callback: CallbackQuery, state: FSMContext
+) -> None:
     """Обработчик, срабатываемый на нажатие инлаин-клавиш вперед | назад.
 
     Args:
@@ -42,6 +46,7 @@ async def callback_query(callback: CallbackQuery, state: FSMContext) -> None:
         weather_reports, current_page
     )
 
+    # история запросов о погоде пуста
     if not inline_kb:
         await callback.answer()
     else:
@@ -53,13 +58,18 @@ async def callback_query(callback: CallbackQuery, state: FSMContext) -> None:
 
 @router.callback_query(IsCityReport())
 async def get_city_report(callback: CallbackQuery) -> None:
+    """Получение информации о погоде в городе"""
     report_id: int = int(callback.data.split('_')[1])
-    report: WeatherReports = get_report_city(str(callback.from_user.id),
-                                             report_id)
+    report: WeatherReports = get_report_city(
+        str(callback.from_user.id),
+        report_id
+    )
 
-    weather_info: str = get_weather_information(report.temp, report.feels_like,
-                                                str(report.wind_speed),
-                                                str(report.pressure_mm))
+    weather_info: str = get_weather_information(
+        report.temp, report.feels_like,
+        str(report.wind_speed),
+        str(report.pressure_mm)
+    )
     city_and_date: str = f'{report.city} ' + \
         f'{report.date.strftime("%d-%m-%Y %H:%M:%S")}'
 
@@ -69,4 +79,5 @@ async def get_city_report(callback: CallbackQuery) -> None:
 
 @router.callback_query(IsNotCallClick())
 async def empty_answer(callback: CallbackQuery) -> None:
+    """Пустой коллбэк"""
     await callback.answer()

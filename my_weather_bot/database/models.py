@@ -34,6 +34,7 @@ class User(Base):
     информации о погоде в некотором городе"""
 
     __tablename__ = 'Users'
+    
     user_id = Column('user_id', Integer, primary_key=True, autoincrement=True)
     tg_id = Column('tg_id', String, nullable=False, unique=True)
     city = Column('city', String)
@@ -48,6 +49,7 @@ class WeatherReports(Base):
     """Таблица, отображающая сведения о погоде"""
 
     __tablename__ = 'WeatherReports'
+
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     owner = Column(Integer, ForeignKey('Users.user_id'), nullable=False)
     date = Column('date', DateTime, default=datetime.now(), nullable=False)

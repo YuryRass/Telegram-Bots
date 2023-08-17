@@ -2,11 +2,15 @@
     Handler-ы, срабатывающие при нажатии
     пользователем на клавиши главной клавиатуры
 """
+
 from aiogram import Router
-from aiogram.types import Message, ReplyKeyboardMarkup, InlineKeyboardMarkup
+from aiogram.types import (
+    Message, ReplyKeyboardMarkup, InlineKeyboardMarkup
+)
 from aiogram.filters import Text, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
+
 from keyboards import get_main_menu_kb, get_menu_kb, get_reports_desk
 from lexicon import BOT_BUTTONS, BOT_PHRASE, get_weather_information, \
     bot_welcome_phrase
@@ -42,13 +46,17 @@ async def other_city_start(message: Message, state: FSMContext):
         на клавишу |Погода в другом городе|
     """
     menu_kb: ReplyKeyboardMarkup = get_menu_kb()
-    await message.answer(text=BOT_PHRASE['input_city_name'],
-                         reply_markup=menu_kb)
+    await message.answer(
+        text=BOT_PHRASE['input_city_name'],
+        reply_markup=menu_kb
+    )
     await state.set_state(ChoiceCityWeather.waiting_city)
 
 
 @router.message(StateFilter(ChoiceCityWeather.waiting_city))
 async def show_weather_in_chosen_city(message: Message, state: FSMContext):
+    """Получение информации о погоде в выбранном городе.
+    """
     if message.text[0].islower():
         await message.answer(text=BOT_PHRASE['incorrect_name_of_city'])
         return
@@ -57,9 +65,13 @@ async def show_weather_in_chosen_city(message: Message, state: FSMContext):
     city = await state.get_data()
     weather_in_city: WeatherInCity = WeatherInCity(city.get('waiting_city'))
     data = weather_in_city.get_weather()
+
     info: str = f'Погода в городе {city.get("waiting_city")}\n' + \
-        get_weather_information(data["temp"], data["feels_like"],
-                                data["wind_speed"], data["pressure_mm"])
+        get_weather_information(
+            data["temp"], data["feels_like"],
+            data["wind_speed"], data["pressure_mm"]
+        )
+
     create_report(str(message.from_user.id), int(data["temp"]),
                   int(data["feels_like"]), int(data["wind_speed"]),
                   int(data["pressure_mm"]), city.get("waiting_city"))
@@ -69,6 +81,7 @@ async def show_weather_in_chosen_city(message: Message, state: FSMContext):
 
 @router.message(Text(text=BOT_BUTTONS['set_your_city']))
 async def my_city_start(message: Message, state: FSMContext):
+    """Установка пользовательского города"""
     menu_kb: ReplyKeyboardMarkup = get_menu_kb()
     await message.answer(text=BOT_PHRASE['input_your_city_name'],
                          reply_markup=menu_kb)
@@ -76,7 +89,8 @@ async def my_city_start(message: Message, state: FSMContext):
 
 
 @router.message(Text(text=BOT_BUTTONS['history']), StateFilter(default_state))
-async def update_current_page(message: Message, state: FSMContext):
+async def get_weather_history(message: Message, state: FSMContext):
+    """Получение истории пользовательских запросов о погоде"""
     reports: list[WeatherReports] = get_reports(str(message.from_user.id))
     inline_kb: InlineKeyboardMarkup = get_reports_desk(reports, 1)
     await message.answer(text=BOT_PHRASE['history_of_queries'],
